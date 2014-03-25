@@ -7,3 +7,56 @@ require './lib/purchase'
 
 ActiveRecord::Base.establish_connection(YAML::load(File.open('./db/config.yml'))['development'])
 
+
+def menu
+  choice = nil
+  until choice == 'x'
+    print_options
+    choice = prompt('Enter choice')
+    case choice
+    when '+pr'
+      add_product
+    when 'lpr'
+      list_products
+    when 'x'
+      puts 'Good-bye!'
+    else
+      puts 'Invalid option!'
+    end
+  end
+end
+
+def print_options
+  puts "\n\n"
+  puts "Enter '+pr' to add a product to the store's catalog."
+  puts "Enter 'lpr' to list all products in catalog."
+  puts "Enter 'x' to exit."
+end
+
+def prompt(string)
+  print string + ': '
+  gets.chomp.downcase
+end
+
+def list_products
+  puts "\n******* Product Catalog *******"
+  Product.all.each do |product|
+    puts product.name + "\t\t$" + product.price.to_s
+  end
+  print '*'*31 + "\n\n"
+end
+
+def add_product
+  list_products
+  product_name = prompt('Enter new product name')
+  product_price = prompt("Enter #{product_name} price").to_f
+  new_product = Product.new({ :name => product_name, :price => product_price })
+  if new_product.save
+    puts "Created #{new_product.name}"
+  else
+    puts "Catalog already has #{new_product.name}!"
+  end
+end
+
+puts 'Welcome to the Point-Of-Sale System!'
+menu
