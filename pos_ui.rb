@@ -65,7 +65,7 @@ def add_product
 end
 
 def list_cashiers
-  puts "\n----------- Cashiers -----------"
+  puts "\n---------- Cashiers -----------"
   Cashier.all.each do |cashier|
     puts cashier.login
   end
