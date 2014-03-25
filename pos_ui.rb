@@ -195,15 +195,25 @@ def print_receipt(receipt)
 end
 
 def data_menu
-  puts "Enter 's' to review sales by date"
-  puts "Enter 'm' to return to main menu"
+  puts "Enter 's' to review sales by date."
+  puts "Enter 'ce' to review cashier efficency."
+  puts "Enter 'm' to return to main menu."
   choice = prompt('Enter choice')
   case choice
   when 's'
     list_receipts
     sales_by_date
+  when 'ce'
+    list_cashiers
+    cashier_login = prompt('Enter a cashier name to see their customer count')
+    cashier = Cashier.find_by_login(cashier_login)
+    unless cashier.nil?
+      cashier_customer_count(cashier)
+    else
+      puts 'Invalid cashier name!'
+    end
   when 'm'
-    puts "Returning to main menu..."
+    puts 'Returning to main menu...'
   else
     puts 'Invalid entry'
   end
@@ -232,6 +242,18 @@ def sales_by_date
   else
     puts "Invalid date range"
   end
+end
+
+def cashier_customer_count(cashier)
+  date_input = prompt('Enter starting date (YYYY-MM-DD format)')
+  first_date = Time.parse(date_input)
+  date_input = prompt('Enter end date (YYYY-MM-DD format)')
+  temp = Time.parse(date_input)
+  second_date = Time.local(temp.year, temp.month, temp.day+1)
+  receipts = cashier.receipts.select do |receipt|
+    receipt.created_at >= first_date && receipt.created_at <= second_date
+  end
+  puts "#{cashier.login} has served #{receipts.length} customers."
 end
 
 puts 'Welcome to the Point-Of-Sale System!'
