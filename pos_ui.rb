@@ -29,6 +29,8 @@ def menu
       list_cashiers
     when 'log'
       cashier_login
+    when 'data'
+      data_menu
     when 'x'
       puts 'Good-bye!'
     else
@@ -46,6 +48,7 @@ def print_options
   puts "Enter 'log' to login as a cashier."
   puts "Enter '+cu' to add a customer."
   puts "Enter 'lcu' to list customers."
+  puts "Enter 'data' to query store data"
   puts "Enter 'x' to exit."
 end
 
@@ -162,7 +165,6 @@ def checkout(cashier)
   else
     puts 'Invalid customer name!'
   end
-
 end
 
 def add_purchase
@@ -179,21 +181,57 @@ def add_purchase
   new_purchase
 end
 
-
 def print_receipt(receipt)
   puts "//// Neighborhood Irish Pub & Jeweler ////"
   puts "Customer: #{receipt.customer.name}\t\tCashier: #{receipt.cashier.login}"
   puts "Date: #{receipt.created_at}"
   print '/'*42 + "\n"
-  grand_total = 0.0
   receipt.purchases.each do |purchase|
     purchase_total = purchase.quantity * purchase.product.price
-    grand_total += purchase_total
     puts purchase.product.name + "\t (" + purchase.quantity.to_s + ") at $" + purchase.product.price.to_s + "\t = " + purchase_total.to_s
   end
   print '_'*40 + "\n"
-  puts "Total:\t\t$#{grand_total}"
+  puts "Total:\t\t$#{receipt.total_income}"
+end
 
+def data_menu
+  puts "Enter 's' to review sales by date"
+  puts "Enter 'm' to return to main menu"
+  choice = prompt('Enter choice')
+  case choice
+  when 's'
+    list_receipts
+    sales_by_date
+  when 'm'
+    puts "Returning to main menu..."
+  else
+    puts 'Invalid entry'
+  end
+end
+
+def list_receipts
+  Receipt.all.each do |receipt|
+    puts "#{receipt.created_at}\t\t#{receipt.customer.name}\t$#{receipt.total_income}"
+  end
+end
+
+def sales_by_date
+  date_input = prompt('Enter starting date (YYYY-MM-DD format)')
+  first_date = Time.parse(date_input)
+  date_input = prompt('Enter end date (YYYY-MM-DD format)')
+  temp = Time.parse(date_input)
+  second_date = Time.local(temp.year, temp.month, temp.day+1)
+  receipts = Receipt.receipts_for_period(first_date, second_date)
+  grand_total = 0.0
+  unless receipts.nil?
+    receipts.each do |receipt|
+      grand_total += receipt.total_income
+      puts receipt.id.to_s + ")\t\t$"+ receipt.total_income.to_s
+    end
+    puts "Total for this date range is: $#{grand_total}."
+  else
+    puts "Invalid date range"
+  end
 end
 
 puts 'Welcome to the Point-Of-Sale System!'
