@@ -31,6 +31,8 @@ def menu
       cashier_login
     when 'data'
       data_menu
+    when 'lr'
+      list_receipts
     when 'x'
       puts 'Good-bye!'
     else
@@ -68,7 +70,8 @@ def manager_options
   puts "Enter 'log' to login as a cashier."
   puts "Enter '+cu' to add a customer."
   puts "Enter 'lcu' to list customers."
-  puts "Enter 'data' to query store data"
+  puts "Enter 'data' to query store data."
+  puts "Enter 'lr' to list receipts."
   puts "Enter 'x' to exit."
 end
 
@@ -149,11 +152,14 @@ def cashier_menu(cashier)
   choice = nil
   until choice == 'm'
     puts "Enter 'p' to checkout customer."
+    puts "Enter 'r' to process a return."
     puts "Enter 'm' to logout and return to main menu."
     choice = prompt('Enter choice').downcase
     case choice
     when 'p'
       checkout(cashier)
+    when 'r'
+      process_return(cashier)
     when 'm'
       puts "Logging out.\n\n"
     else
@@ -212,6 +218,26 @@ def print_receipt(receipt)
   end
   print '_'*40 + "\n"
   puts "Total:\t\t$#{receipt.total_income}"
+end
+
+def process_return(cashier)
+  list_customers
+  customer_name = prompt('Enter customer name')
+  customer = Customer.find_by_name(customer_name)
+  customer.receipts.each do |receipt|
+    receipt.purchases.each do |purchase|
+      puts "Receipt ID: " + receipt.id.to_s + ", " + purchase.product.name + ", (" + purchase.quantity.to_s + ")"
+    end
+  end
+  receipt_id = prompt('Enter receipt ID').to_i
+  product_name = prompt('Enter product to return')
+  product_id = Product.find_by_name(product_name).id
+  return_quantity = prompt('Enter quantity to return').to_i
+
+  return_receipt = Receipt.create({ :customer_id => customer.id, :cashier_id => cashier.id })
+  return_purchase = Purchase.create({ :receipt_id => return_receipt.id, :product_id => product_id, :quantity => - return_quantity })
+
+  puts "Return proessed for #{return_receipt.customer.name}, by cashier #{return_receipt.cashier.login} for #{return_purchase.product.name}"
 end
 
 def data_menu

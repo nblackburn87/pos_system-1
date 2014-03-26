@@ -12,6 +12,8 @@ Make a point of sale (POS) system for a convenience store. A POS is a system tha
 
 • Added store manager and cashier use cases.
 
-As a customer, I want to be able to return items, so that I can bring back things I don't want.
+• As a customer, I want to be able to return items, so that I can bring back things I don't want.
+
 As a store manager, I want to see which products are most popular, so I can order more of them.
+
 As a store manager, I want to see which items are returned most often, so I can catch any quality problems.
