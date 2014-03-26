@@ -12,7 +12,7 @@ I18n.enforce_available_locales = false
 def menu
   choice = nil
   until choice == 'x'
-    print_options
+    manager_options
     choice = prompt('Enter choice')
     case choice
     when '+pr'
@@ -39,7 +39,27 @@ def menu
   end
 end
 
-def print_options
+def login_menu
+  puts "Enter 'm' for store manager options"
+  puts "Enter 'c' for cashier options"
+  choice = prompt('Enter choice').downcase
+  case choice
+  when 'm'
+    password = prompt('Enter password').downcase
+    if password == 'epicodus'
+      menu
+    else
+      puts "Invalid input!"
+      exit
+    end
+  when 'c'
+    cashier_login
+  else
+    puts "Invalid input!"
+  end
+end
+
+def manager_options
   puts "\n\n"
   puts "Enter '+pr' to add a product to the store's catalog."
   puts "Enter 'lpr' to list all products in catalog."
@@ -257,4 +277,4 @@ def cashier_customer_count(cashier)
 end
 
 puts 'Welcome to the Point-Of-Sale System!'
-menu
+login_menu
